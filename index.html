@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Todo App</title>
+    <title>Todo App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -18,7 +18,7 @@
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .header {
             display: flex;
@@ -83,8 +83,10 @@
             background-color: #f0f0f0;
         }
         .footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
             margin-top: 20px;
-            text-align: right;
         }
         .footer span {
             font-size: 16px;
@@ -95,79 +97,68 @@
 <body>
     <div class="container">
         <div class="header">
-            <input type="text" id="todo-input" placeholder="Add new todo item">
+            <input type="text" id="todo-input" placeholder="Add new todo">
             <button id="add-todo-btn">Add</button>
         </div>
         <ul class="todo-list" id="todo-list"></ul>
         <div class="footer">
-            <span id="remaining-count">0 items remaining</span>
+            <span id="remaining-todos">0 items left</span>
         </div>
     </div>
     <script>
-        let todoList = [];
-        let remainingCount = 0;
+        let todos = [];
+        let todoInput = document.getElementById('todo-input');
+        let addTodoBtn = document.getElementById('add-todo-btn');
+        let todoList = document.getElementById('todo-list');
+        let remainingTodosSpan = document.getElementById('remaining-todos');
 
-        document.getElementById('add-todo-btn').addEventListener('click', addTodo);
+        addTodoBtn.addEventListener('click', addTodo);
 
         function addTodo() {
-            const todoInput = document.getElementById('todo-input');
-            const todoText = todoInput.value.trim();
+            let todoText = todoInput.value.trim();
             if (todoText !== '') {
-                const todoItem = {
+                let todo = {
                     text: todoText,
                     completed: false
                 };
-                todoList.push(todoItem);
-                remainingCount++;
-                renderTodoList();
+                todos.push(todo);
                 todoInput.value = '';
+                renderTodos();
             }
         }
 
-        function renderTodoList() {
-            const todoListElement = document.getElementById('todo-list');
-            todoListElement.innerHTML = '';
-            todoList.forEach((todoItem, index) => {
-                const todoItemElement = document.createElement('li');
-                todoItemElement.className = 'todo-item';
-                const todoTextElement = document.createElement('span');
-                todoTextElement.textContent = todoItem.text;
-                if (todoItem.completed) {
-                    todoTextElement.className = 'completed';
+        function renderTodos() {
+            todoList.innerHTML = '';
+            let remainingTodos = 0;
+            todos.forEach((todo, index) => {
+                let todoItem = document.createElement('li');
+                todoItem.classList.add('todo-item');
+                let todoSpan = document.createElement('span');
+                todoSpan.textContent = todo.text;
+                if (todo.completed) {
+                    todoSpan.classList.add('completed');
                 }
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'X';
-                deleteButton.addEventListener('click', () => deleteTodo(index));
-                const completeButton = document.createElement('button');
-                completeButton.textContent = todoItem.completed ? 'Uncomplete' : 'Complete';
-                completeButton.addEventListener('click', () => completeTodo(index));
-                todoItemElement.appendChild(todoTextElement);
-                todoItemElement.appendChild(completeButton);
-                todoItemElement.appendChild(deleteButton);
-                todoListElement.appendChild(todoItemElement);
+                let deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.addEventListener('click', () => {
+                    todos.splice(index, 1);
+                    renderTodos();
+                });
+                let completeBtn = document.createElement('button');
+                completeBtn.textContent = todo.completed ? 'Uncomplete' : 'Complete';
+                completeBtn.addEventListener('click', () => {
+                    todo.completed = !todo.completed;
+                    renderTodos();
+                });
+                todoItem.appendChild(todoSpan);
+                todoItem.appendChild(completeBtn);
+                todoItem.appendChild(deleteBtn);
+                todoList.appendChild(todoItem);
+                if (!todo.completed) {
+                    remainingTodos++;
+                }
             });
-            document.getElementById('remaining-count').textContent = `${remainingCount} items remaining`;
-        }
-
-        function deleteTodo(index) {
-            if (todoList[index].completed) {
-                remainingCount++;
-            } else {
-                remainingCount--;
-            }
-            todoList.splice(index, 1);
-            renderTodoList();
-        }
-
-        function completeTodo(index) {
-            if (todoList[index].completed) {
-                todoList[index].completed = false;
-                remainingCount++;
-            } else {
-                todoList[index].completed = true;
-                remainingCount--;
-            }
-            renderTodoList();
+            remainingTodosSpan.textContent = `${remainingTodos} items left`;
         }
     </script>
 </body>
