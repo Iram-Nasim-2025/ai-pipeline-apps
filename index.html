@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 375px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header input {
+            width: 70%;
+            height: 30px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .header button {
+            width: 25%;
+            height: 30px;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .header button:hover {
+            background-color: #3e8e41;
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .todo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item span {
+            font-size: 16px;
+        }
+        .todo-item span.completed {
+            text-decoration: line-through;
+            color: #666;
+        }
+        .todo-item button {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            font-size: 16px;
+            background-color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .todo-item button:hover {
+            background-color: #f0f0f0;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .footer span {
+            font-size: 16px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <input type="text" id="todo-input" placeholder="Add new todo item">
+            <button id="add-todo-btn">Add</button>
+        </div>
+        <ul class="todo-list" id="todo-list"></ul>
+        <div class="footer">
+            <span id="remaining-count">0 items remaining</span>
+        </div>
+    </div>
+    <script>
+        let todoList = [];
+        let remainingCount = 0;
+
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoListElement = document.getElementById('todo-list');
+        const remainingCountElement = document.getElementById('remaining-count');
+
+        addTodoBtn.addEventListener('click', addTodoItem);
+
+        function addTodoItem() {
+            const todoText = todoInput.value.trim();
+            if (todoText) {
+                const todoItem = {
+                    text: todoText,
+                    completed: false
+                };
+                todoList.push(todoItem);
+                remainingCount++;
+                updateTodoList();
+                todoInput.value = '';
+            }
+        }
+
+        function updateTodoList() {
+            todoListElement.innerHTML = '';
+            todoList.forEach((todoItem, index) => {
+                const todoItemElement = document.createElement('li');
+                todoItemElement.className = 'todo-item';
+                const todoTextElement = document.createElement('span');
+                todoTextElement.textContent = todoItem.text;
+                if (todoItem.completed) {
+                    todoTextElement.className = 'completed';
+                }
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'X';
+                deleteButton.addEventListener('click', () => deleteTodoItem(index));
+                const completeButton = document.createElement('button');
+                completeButton.textContent = todoItem.completed ? 'Uncomplete' : 'Complete';
+                completeButton.addEventListener('click', () => completeTodoItem(index));
+                todoItemElement.appendChild(todoTextElement);
+                todoItemElement.appendChild(completeButton);
+                todoItemElement.appendChild(deleteButton);
+                todoListElement.appendChild(todoItemElement);
+            });
+            remainingCountElement.textContent = `${getRemainingCount()} items remaining`;
+        }
+
+        function deleteTodoItem(index) {
+            if (todoList[index].completed) {
+                remainingCount++;
+            }
+            todoList.splice(index, 1);
+            updateTodoList();
+        }
+
+        function completeTodoItem(index) {
+            todoList[index].completed = !todoList[index].completed;
+            if (todoList[index].completed) {
+                remainingCount--;
+            } else {
+                remainingCount++;
+            }
+            updateTodoList();
+        }
+
+        function getRemainingCount() {
+            return todoList.filter(todoItem => !todoItem.completed).length;
+        }
+    </script>
+</body>
+</html>
