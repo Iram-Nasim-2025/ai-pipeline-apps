@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Todo App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 375px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .todo-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item.completed {
+            text-decoration: line-through;
+            color: #666;
+        }
+        .todo-item.completed::before {
+            content: "\2713";
+            font-size: 18px;
+            color: #4CAF50;
+            margin-right: 10px;
+        }
+        .delete-btn {
+            float: right;
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .add-todo {
+            margin-top: 20px;
+        }
+        .add-todo input {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+        }
+        .add-todo button {
+            width: 25%;
+            padding: 10px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        .add-todo button:hover {
+            background-color: #3e8e41;
+        }
+        .count {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Simple Todo App</h2>
+        <ul class="todo-list" id="todo-list"></ul>
+        <div class="add-todo">
+            <input type="text" id="todo-input" placeholder="Add new todo item">
+            <button id="add-todo-btn">Add</button>
+        </div>
+        <p class="count" id="count">0 items remaining</p>
+    </div>
+    <script>
+        let todoList = [];
+        let count = 0;
+
+        const todoInput = document.getElementById('todo-input');
+        const addTodoBtn = document.getElementById('add-todo-btn');
+        const todoListElement = document.getElementById('todo-list');
+        const countElement = document.getElementById('count');
+
+        addTodoBtn.addEventListener('click', addTodo);
+
+        function addTodo() {
+            const todoText = todoInput.value.trim();
+            if (todoText) {
+                const todoItem = {
+                    text: todoText,
+                    completed: false
+                };
+                todoList.push(todoItem);
+                count++;
+                updateTodoList();
+                todoInput.value = '';
+            }
+        }
+
+        function updateTodoList() {
+            todoListElement.innerHTML = '';
+            todoList.forEach((todo, index) => {
+                const todoItemElement = document.createElement('li');
+                todoItemElement.classList.add('todo-item');
+                if (todo.completed) {
+                    todoItemElement.classList.add('completed');
+                }
+                todoItemElement.innerHTML = `
+                    <span>${todo.text}</span>
+                    <button class="delete-btn" onclick="deleteTodo(${index})">Delete</button>
+                    <button class="complete-btn" onclick="completeTodo(${index})">Complete</button>
+                `;
+                todoListElement.appendChild(todoItemElement);
+            });
+            countElement.textContent = `${count} items remaining`;
+        }
+
+        function deleteTodo(index) {
+            todoList.splice(index, 1);
+            if (todoList.length < count) {
+                count--;
+            }
+            updateTodoList();
+        }
+
+        function completeTodo(index) {
+            todoList[index].completed = true;
+            count--;
+            updateTodoList();
+        }
+    </script>
+</body>
+</html>
